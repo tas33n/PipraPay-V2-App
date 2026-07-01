@@ -173,7 +173,21 @@ public class ForwardingConfig {
             ForwardingConfig config = new ForwardingConfig(context);
             config.setSender(entry.getKey());
 
+            // Safety: skip non-String or null values
+            if (!(entry.getValue() instanceof String)) {
+                Log.w("ForwardingConfig", "skipping non-string entry: " + entry.getKey());
+                continue;
+            }
+
             String value = (String) entry.getValue();
+
+            // Safety: skip empty values
+            if (value == null || value.isEmpty()) {
+                Log.w("ForwardingConfig", "skipping empty entry: " + entry.getKey());
+                continue;
+            }
+
+            boolean parseSuccess = false;
 
             if (value.charAt(0) == '{') {
                 try {
@@ -216,16 +230,22 @@ public class ForwardingConfig {
                         config.setChunkedMode(json.getBoolean(KEY_CHUNKED_MODE));
                     } catch (JSONException ignored) {
                     }
+
+                    parseSuccess = true;
                 } catch (JSONException e) {
-                    Log.e("ForwardingConfig", e.getMessage());
+                    Log.e("ForwardingConfig", "JSON parse error for key '" + entry.getKey() + "': " + e.getMessage());
                 }
             } else {
                 config.setUrl(value);
                 config.setTemplate(ForwardingConfig.getDefaultJsonTemplate());
                 config.setHeaders(ForwardingConfig.getDefaultJsonHeaders());
+                parseSuccess = true;
             }
 
-            configs.add(config);
+            // Only add fully-parsed configs to avoid NPE downstream
+            if (parseSuccess && config.getUrl() != null) {
+                configs.add(config);
+            }
         }
 
         return configs;

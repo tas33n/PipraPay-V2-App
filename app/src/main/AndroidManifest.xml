@@ -31,6 +31,10 @@
             </intent-filter>
         </activity>
 
+        <activity
+            android:name=".Activity.LoggerActivity"
+            android:exported="false" />
+
         <service
             android:name=".Forwarding_Class.SmsReceiverService"
             android:enabled="true"

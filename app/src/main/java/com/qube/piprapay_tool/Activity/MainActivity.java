@@ -129,6 +129,11 @@ public class MainActivity extends BaseActivity {
         String greeting = getGreetingMessage();
         greetingTextView.setText(greeting);
 
+        ImageView btnLogger = findViewById(R.id.btnLogger);
+        btnLogger.setOnClickListener(v -> {
+            Intent intent = new Intent(MainActivity.this, LoggerActivity.class);
+            startActivity(intent);
+        });
 
         if (User_name != null && !User_name.trim().isEmpty()) {
             user_name.setText(User_name);

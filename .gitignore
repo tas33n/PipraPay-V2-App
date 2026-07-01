@@ -25,3 +25,5 @@ output.json
 /captures
 .externalNativeBuild
 .cxx
+server
+works.md

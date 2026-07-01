@@ -14,6 +14,7 @@ import androidx.work.OneTimeWorkRequest;
 import androidx.work.WorkManager;
 import androidx.work.WorkRequest;
 
+import com.qube.piprapay_tool.Class.AppLogger;
 import com.qube.piprapay_tool.R;
 
 import java.util.ArrayList;
@@ -50,9 +51,13 @@ public class SmsBroadcastReceiver extends BroadcastReceiver {
 
         String sender = messages[0].getOriginatingAddress();
         if (sender == null) {
+            AppLogger.log(context, "SmsReceiver", "Received SMS with null sender");
             return;
         }
 
+        AppLogger.log(context, "SmsReceiver", "Received SMS from: " + sender);
+
+        boolean matched = false;
         for (ForwardingConfig config : configs) {
             if (!sender.equals(config.getSender()) && !config.getSender().equals(asterisk)) {
                 continue;
@@ -76,7 +81,13 @@ public class SmsBroadcastReceiver extends BroadcastReceiver {
                 slotName = "sim" + slotId;
             }
 
+            matched = true;
+            AppLogger.log(context, "SmsReceiver", "Matched sender config: " + config.getSender() + " -> " + config.getUrl());
             this.callWebHook(config, sender, slotName, content.toString(), messages[0].getTimestampMillis());
+        }
+
+        if (!matched) {
+            AppLogger.log(context, "SmsReceiver", "No matching sender config found for: " + sender);
         }
     }
 
@@ -84,6 +95,7 @@ public class SmsBroadcastReceiver extends BroadcastReceiver {
                                String content, long timeStamp) {
 
         String message = config.prepareMessage(sender, content, slotName, timeStamp);
+        AppLogger.log(context, "SmsReceiver", "Prepared message payload for WebHook");
 
         Constraints constraints = new Constraints.Builder()
                 .setRequiredNetworkType(NetworkType.CONNECTED)
