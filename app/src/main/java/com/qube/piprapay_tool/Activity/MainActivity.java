@@ -209,11 +209,17 @@ public class MainActivity extends BaseActivity {
         });
         checkboxSms.setOnClickListener(v -> {
             if (checkboxSms.isChecked()) {
-                // Ask for permission if not granted
-                if (ActivityCompat.checkSelfPermission(this, Manifest.permission.RECEIVE_SMS)
-                        != PackageManager.PERMISSION_GRANTED) {
-                    ActivityCompat.requestPermissions(this,
-                            new String[]{Manifest.permission.RECEIVE_SMS}, REQUEST_SMS_PERMISSION);
+                java.util.ArrayList<String> perms = new java.util.ArrayList<>();
+                if (ActivityCompat.checkSelfPermission(this, Manifest.permission.RECEIVE_SMS) != PackageManager.PERMISSION_GRANTED) {
+                    perms.add(Manifest.permission.RECEIVE_SMS);
+                }
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    if (ActivityCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+                        perms.add(Manifest.permission.POST_NOTIFICATIONS);
+                    }
+                }
+                if (!perms.isEmpty()) {
+                    ActivityCompat.requestPermissions(this, perms.toArray(new String[0]), REQUEST_SMS_PERMISSION);
                 }
             } else {
                 // Open App Settings to allow user to revoke permission manually
@@ -366,12 +372,25 @@ public class MainActivity extends BaseActivity {
         appContext.stopService(intent);
     }
     private void checkPermissions() {
+        java.util.ArrayList<String> permissionsToRequest = new java.util.ArrayList<>();
+
         // SMS Permission
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.RECEIVE_SMS) == PackageManager.PERMISSION_GRANTED) {
             checkboxSms.setChecked(true);
         } else {
             checkboxSms.setChecked(false);
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.RECEIVE_SMS}, REQUEST_SMS_PERMISSION);
+            permissionsToRequest.add(Manifest.permission.RECEIVE_SMS);
+        }
+
+        // Notification Permission for Android 13+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+                permissionsToRequest.add(Manifest.permission.POST_NOTIFICATIONS);
+            }
+        }
+
+        if (!permissionsToRequest.isEmpty()) {
+            ActivityCompat.requestPermissions(this, permissionsToRequest.toArray(new String[0]), REQUEST_SMS_PERMISSION);
         }
 
         // Ignore Battery Optimization
