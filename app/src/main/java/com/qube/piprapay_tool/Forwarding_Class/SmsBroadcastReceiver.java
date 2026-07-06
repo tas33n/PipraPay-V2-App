@@ -15,7 +15,10 @@ import androidx.work.WorkManager;
 import androidx.work.WorkRequest;
 
 import com.qube.piprapay_tool.Class.AppLogger;
+import com.qube.piprapay_tool.Class.HistoryDatabaseHelper;
+import com.qube.piprapay_tool.Class.SecurityPrefs;
 import com.qube.piprapay_tool.R;
+import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.Set;
@@ -56,6 +59,23 @@ public class SmsBroadcastReceiver extends BroadcastReceiver {
         }
 
         AppLogger.log(context, "SmsReceiver", "Received SMS from: " + sender);
+        HistoryDatabaseHelper db = new HistoryDatabaseHelper(context);
+        SmsReceiverService.updateStatus(context, "Processing SMS", "From: " + sender);
+
+        // Security check: Whitelist
+        if (!SecurityPrefs.isSenderWhitelisted(context, sender)) {
+            AppLogger.log(context, Log.WARN, "SmsReceiver", "Ignored SMS from " + sender + " (Not in whitelist)");
+            db.insertHistory(sender, content.toString(), messages[0].getTimestampMillis(), HistoryDatabaseHelper.STATUS_IGNORED, "N/A - Blocked by Whitelist");
+            return;
+        }
+
+        // Security check: Blacklist
+        if (SecurityPrefs.containsBlacklistedKeyword(context, content.toString())) {
+            AppLogger.log(context, Log.WARN, "SmsReceiver", "Ignored SMS from " + sender + " (Contains blacklisted keyword)");
+            db.insertHistory(sender, content.toString(), messages[0].getTimestampMillis(), HistoryDatabaseHelper.STATUS_IGNORED, "N/A - Blocked by Blacklist");
+            SmsReceiverService.updateStatus(context, "Ignored SMS", "Message contained blocked keyword.");
+            return;
+        }
 
         boolean matched = false;
         for (ForwardingConfig config : configs) {
@@ -83,16 +103,19 @@ public class SmsBroadcastReceiver extends BroadcastReceiver {
 
             matched = true;
             AppLogger.log(context, "SmsReceiver", "Matched sender config: " + config.getSender() + " -> " + config.getUrl());
-            this.callWebHook(config, sender, slotName, content.toString(), messages[0].getTimestampMillis());
+            long historyId = db.insertHistory(sender, content.toString(), messages[0].getTimestampMillis(), HistoryDatabaseHelper.STATUS_PENDING, config.getUrl());
+            this.callWebHook(config, sender, slotName, content.toString(), messages[0].getTimestampMillis(), historyId);
         }
 
         if (!matched) {
             AppLogger.log(context, "SmsReceiver", "No matching sender config found for: " + sender);
+            db.insertHistory(sender, content.toString(), messages[0].getTimestampMillis(), HistoryDatabaseHelper.STATUS_IGNORED, "N/A - No matching config");
+            SmsReceiverService.updateStatus(context, "Ignored SMS", "No webhook configured for this sender.");
         }
     }
 
     protected void callWebHook(ForwardingConfig config, String sender, String slotName,
-                               String content, long timeStamp) {
+                               String content, long timeStamp, long historyId) {
 
         String message = config.prepareMessage(sender, content, slotName, timeStamp);
         AppLogger.log(context, "SmsReceiver", "Prepared message payload for WebHook");
@@ -108,6 +131,7 @@ public class SmsBroadcastReceiver extends BroadcastReceiver {
                 .putBoolean(RequestWorker.DATA_IGNORE_SSL, config.getIgnoreSsl())
                 .putBoolean(RequestWorker.DATA_CHUNKED_MODE, config.getChunkedMode())
                 .putInt(RequestWorker.DATA_MAX_RETRIES, config.getRetriesNumber())
+                .putLong(RequestWorker.DATA_HISTORY_ID, historyId)
                 .build();
 
         WorkRequest workRequest =

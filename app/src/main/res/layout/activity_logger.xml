@@ -24,6 +24,7 @@
             android:layout_width="32dp"
             android:layout_height="32dp"
             android:padding="4dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
             android:src="@android:drawable/ic_menu_revert"
             app:tint="@color/main_color" />
 
@@ -40,13 +41,32 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Enable"
-            android:layout_marginEnd="16dp" />
+            android:layout_marginEnd="12dp" />
+
+        <ImageView
+            android:id="@+id/btnCopy"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:padding="4dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:src="@android:drawable/ic_menu_agenda"
+            app:tint="@color/main_color" />
+            
+        <ImageView
+            android:id="@+id/btnShare"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:padding="4dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:src="@android:drawable/ic_menu_share"
+            app:tint="@color/main_color" />
 
         <ImageView
             android:id="@+id/btnClear"
             android:layout_width="32dp"
             android:layout_height="32dp"
             android:padding="4dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
             android:src="@android:drawable/ic_menu_delete"
             app:tint="@color/main_color" />
     </LinearLayout>
@@ -67,6 +87,7 @@
             android:fontFamily="monospace"
             android:textSize="12sp"
             android:textColor="#333333"
+            android:textIsSelectable="true"
             android:text="No logs yet..." />
     </ScrollView>
 

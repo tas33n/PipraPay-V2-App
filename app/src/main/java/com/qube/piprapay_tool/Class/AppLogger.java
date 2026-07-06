@@ -4,6 +4,8 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.util.Log;
 
+import org.apache.commons.text.StringEscapeUtils;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -17,12 +19,12 @@ public class AppLogger {
 
     private static final String PREFS_NAME = "LoggerPrefs";
     private static final String KEY_LOGGING_ENABLED = "logging_enabled";
-    private static final String LOG_FILE_NAME = "app_debug_logs.txt";
+    private static final String LOG_FILE_NAME = "app_debug_logs.log";
     private static final long MAX_FILE_SIZE = 2 * 1024 * 1024; // 2MB
 
     public static boolean isLoggingEnabled(Context context) {
         SharedPreferences prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
-        return prefs.getBoolean(KEY_LOGGING_ENABLED, true); // default true for now
+        return prefs.getBoolean(KEY_LOGGING_ENABLED, true);
     }
 
     public static void setLoggingEnabled(Context context, boolean enabled) {
@@ -31,20 +33,36 @@ public class AppLogger {
     }
 
     public static synchronized void log(Context context, String tag, String message) {
+        log(context, Log.DEBUG, tag, message);
+    }
+
+    public static synchronized void log(Context context, int priority, String tag, String message) {
         if (!isLoggingEnabled(context)) {
-            Log.d(tag, message);
+            Log.println(priority, tag, message);
             return;
         }
 
+        // Unescape unicode (e.g. \u0986 -> Bangla text)
+        String unescapedMessage = StringEscapeUtils.unescapeJava(message);
+
         String timeStamp = new SimpleDateFormat("MM-dd HH:mm:ss.SSS", Locale.US).format(new Date());
-        String logLine = timeStamp + " | " + tag + " | " + message + "\n";
         
-        Log.d(tag, message);
+        String level = "D";
+        switch (priority) {
+            case Log.ERROR: level = "E"; break;
+            case Log.WARN: level = "W"; break;
+            case Log.INFO: level = "I"; break;
+            case Log.VERBOSE: level = "V"; break;
+        }
+
+        // Standard log format
+        String logLine = String.format(Locale.US, "%s %s/%s: %s\n", 
+                timeStamp, level, tag, unescapedMessage);
+
+        Log.println(priority, tag, unescapedMessage);
 
         try {
             File logFile = new File(context.getFilesDir(), LOG_FILE_NAME);
-            
-            // Basic log rotation if file gets too big
             if (logFile.exists() && logFile.length() > MAX_FILE_SIZE) {
                 logFile.delete();
             }
@@ -60,7 +78,7 @@ public class AppLogger {
     public static synchronized String getLogs(Context context) {
         File logFile = new File(context.getFilesDir(), LOG_FILE_NAME);
         if (!logFile.exists()) {
-            return "No logs found.";
+            return "No logs yet...";
         }
 
         StringBuilder logs = new StringBuilder();
@@ -74,6 +92,10 @@ public class AppLogger {
         }
 
         return logs.toString();
+    }
+
+    public static File getLogFile(Context context) {
+        return new File(context.getFilesDir(), LOG_FILE_NAME);
     }
 
     public static synchronized void clearLogs(Context context) {

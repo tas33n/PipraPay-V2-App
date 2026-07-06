@@ -82,6 +82,54 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginVertical="7dp"
+                android:text="Security" />
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/security_settings_btn"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="2dp"
+                android:layout_marginBottom="5dp"
+                android:background="@drawable/subscription_plan_unselect_course"
+                android:elevation="3dp"
+                android:padding="15dp">
+
+                <ImageView
+                    android:id="@+id/security_image"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:srcCompat="@drawable/lock" />
+
+                <TextView
+                    style="@style/medium16"
+                    android:layout_marginStart="12dp"
+                    android:layout_marginLeft="12dp"
+                    android:drawablePadding="8dp"
+                    android:gravity="center"
+                    android:text="Security &amp; Filters"
+                    android:textSize="14sp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toEndOf="@+id/security_image"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/ic_arrow_right_course"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <TextView
+                style="@style/semiBold18"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginVertical="7dp"
                 android:text="Permission" />
 
             <androidx.constraintlayout.widget.ConstraintLayout

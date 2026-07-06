@@ -12,6 +12,7 @@
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />
 
     <application
         android:allowBackup="true"
@@ -35,9 +36,18 @@
             android:name=".Activity.LoggerActivity"
             android:exported="false" />
 
+        <activity
+            android:name=".Activity.SecuritySettingsActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".Activity.HistoryActivity"
+            android:exported="false" />
+
         <service
             android:name=".Forwarding_Class.SmsReceiverService"
             android:enabled="true"
+            android:foregroundServiceType="dataSync"
             android:exported="true" />
 
         <receiver

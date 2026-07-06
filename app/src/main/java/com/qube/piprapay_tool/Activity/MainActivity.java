@@ -89,7 +89,7 @@ public class MainActivity extends BaseActivity {
     private CircularProgressIndicator batteryProgressBar;
     final Toast[] currentToast = new Toast[1];
     private String User_name;
-    private ConstraintLayout clear_data_btn, about_us_btn, faq_btn, live_support, whatsapp_support;
+    private ConstraintLayout clear_data_btn, about_us_btn, faq_btn, live_support, whatsapp_support, security_settings_btn;
     private Handler handler;
     private Runnable urlCheckRunnable;
 
@@ -122,6 +122,7 @@ public class MainActivity extends BaseActivity {
         faq_btn = findViewById(R.id.faq_btn);
         live_support = findViewById(R.id.live_support);
         whatsapp_support = findViewById(R.id.whatsapp_support);
+        security_settings_btn = findViewById(R.id.security_settings_btn);
 
         showList();
         checkPermissions();
@@ -132,6 +133,12 @@ public class MainActivity extends BaseActivity {
         ImageView btnLogger = findViewById(R.id.btnLogger);
         btnLogger.setOnClickListener(v -> {
             Intent intent = new Intent(MainActivity.this, LoggerActivity.class);
+            startActivity(intent);
+        });
+
+        ImageView btnHistory = findViewById(R.id.btnHistory);
+        btnHistory.setOnClickListener(v -> {
+            Intent intent = new Intent(MainActivity.this, HistoryActivity.class);
             startActivity(intent);
         });
 
@@ -307,7 +314,9 @@ public class MainActivity extends BaseActivity {
             intent.setData(Uri.parse("https://api.whatsapp.com/send?phone=8801806579249&text=Hello,%20%0A%20I%20have%20a%20question%20about%20https%3A%2F%2Fpiprapay.com%2F"));
             startActivity(intent);
         });
-
+        security_settings_btn.setOnClickListener(v -> {
+            startActivity(new Intent(MainActivity.this, SecuritySettingsActivity.class));
+        });
 
 
     }
