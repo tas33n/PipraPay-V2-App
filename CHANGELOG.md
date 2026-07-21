@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **CSV Export:** Added an export button to the History view to easily export transaction history to a CSV file.
 - **Webhook Hostname Display:** The History view now displays the target webhook hostname for each SMS record, making it easy to identify which webhook processed which message.
 - **GitHub Actions CI/CD:** Fully automated build pipeline for both Debug and Release APKs, including automatic GitHub Releases on `v*` tags with APK attachments and SHA-256 verification hashes.
+- **Smart Notification Metadata:** Persistent notifications now extract and display live payment metadata (Sender, Amount, TrxID, Reference, Balance) directly in the notification drawer instead of generic "Processing" text.
 
 ### Changed
 - **App Rebranding:** Renamed the app to "PipraPay Enhanced" and updated the `applicationId` to `com.qube.piprapay_enhanced` to allow side-by-side installation with the original PipraPay app.

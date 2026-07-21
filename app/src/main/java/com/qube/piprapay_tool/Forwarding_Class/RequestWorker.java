@@ -19,6 +19,7 @@ public class RequestWorker extends Worker {
     public final static String DATA_MAX_RETRIES = "MAX_RETRIES";
     public final static String DATA_CHUNKED_MODE = "CHUNKED_MODE";
     public final static String DATA_HISTORY_ID = "HISTORY_ID";
+    public final static String DATA_SUMMARY = "SUMMARY";
 
     public RequestWorker(
             @NonNull Context context,
@@ -43,6 +44,10 @@ public class RequestWorker extends Worker {
 
         Context ctx = getApplicationContext();
         long historyId = getInputData().getLong(DATA_HISTORY_ID, -1);
+        String summary = getInputData().getString(DATA_SUMMARY);
+        if (summary == null || summary.isEmpty()) {
+            summary = "SMS data sent to server.";
+        }
         HistoryDatabaseHelper db = new HistoryDatabaseHelper(ctx);
 
         AppLogger.log(ctx, "RequestWorker", "Starting HTTP POST to " + url);
@@ -70,7 +75,7 @@ public class RequestWorker extends Worker {
 
         AppLogger.log(ctx, "RequestWorker", "Result: SUCCESS. HTTP Response: " + result);
         if (historyId != -1) db.updateStatus(historyId, HistoryDatabaseHelper.STATUS_SUCCESS, null);
-        SmsReceiverService.updateStatus(ctx, "Forwarded Successfully", "SMS data sent to server.");
+        SmsReceiverService.updateStatus(ctx, "Forwarded Successfully", summary);
         return Result.success();
     }
 }

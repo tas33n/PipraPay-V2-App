@@ -16,6 +16,7 @@ import androidx.work.WorkRequest;
 
 import com.qube.piprapay_tool.Class.AppLogger;
 import com.qube.piprapay_tool.Class.HistoryDatabaseHelper;
+import com.qube.piprapay_tool.Class.PaymentSmsParser;
 import com.qube.piprapay_tool.Class.SecurityPrefs;
 import com.qube.piprapay_tool.R;
 import android.util.Log;
@@ -60,7 +61,9 @@ public class SmsBroadcastReceiver extends BroadcastReceiver {
 
         AppLogger.log(context, "SmsReceiver", "Received SMS from: " + sender);
         HistoryDatabaseHelper db = new HistoryDatabaseHelper(context);
-        SmsReceiverService.updateStatus(context, "Processing SMS", "From: " + sender);
+        
+        String summary = PaymentSmsParser.getSummary(sender, content.toString());
+        SmsReceiverService.updateStatus(context, "Processing SMS", summary);
 
         // Security check: Whitelist
         if (!SecurityPrefs.isSenderWhitelisted(context, sender)) {
@@ -103,7 +106,7 @@ public class SmsBroadcastReceiver extends BroadcastReceiver {
             matched = true;
             AppLogger.log(context, "SmsReceiver", "Matched sender config: " + config.getSender() + " -> " + config.getUrl());
             long historyId = db.insertHistory(sender, content.toString(), messages[0].getTimestampMillis(), HistoryDatabaseHelper.STATUS_PENDING, config.getUrl());
-            this.callWebHook(config, sender, slotName, content.toString(), messages[0].getTimestampMillis(), historyId);
+            this.callWebHook(config, sender, slotName, content.toString(), messages[0].getTimestampMillis(), historyId, summary);
         }
 
         if (!matched) {
@@ -113,7 +116,7 @@ public class SmsBroadcastReceiver extends BroadcastReceiver {
     }
 
     protected void callWebHook(ForwardingConfig config, String sender, String slotName,
-                               String content, long timeStamp, long historyId) {
+                               String content, long timeStamp, long historyId, String summary) {
 
         String message = config.prepareMessage(sender, content, slotName, timeStamp);
         AppLogger.log(context, "SmsReceiver", "Prepared message payload for WebHook");
@@ -130,6 +133,7 @@ public class SmsBroadcastReceiver extends BroadcastReceiver {
                 .putBoolean(RequestWorker.DATA_CHUNKED_MODE, config.getChunkedMode())
                 .putInt(RequestWorker.DATA_MAX_RETRIES, config.getRetriesNumber())
                 .putLong(RequestWorker.DATA_HISTORY_ID, historyId)
+                .putString(RequestWorker.DATA_SUMMARY, summary)
                 .build();
 
         WorkRequest workRequest =
