@@ -10,7 +10,7 @@
 - [API Endpoints Your Server Must Implement](#api-endpoints-your-server-must-implement)
   - [1. SMS Webhook (Core)](#1-sms-webhook-core)
   - [2. Connection Status / Heartbeat](#2-connection-status--heartbeat)
-  - [3. Config Validation (Add/Edit/Delete)](#3-config-validation-addeditdelete)
+  - [3. Config Validation (Add/Edit)](#3-config-validation-addedit)
 - [Template Placeholders](#template-placeholders)
 - [Default Payload & Headers](#default-payload--headers)
 - [Server Response Format](#server-response-format)
@@ -173,9 +173,11 @@ Content-Type: application/x-www-form-urlencoded
 
 ---
 
-#### 3. Config Validation (Add/Edit/Delete)
+#### 3. Config Validation (Add/Edit)
 
-When users add, edit, or delete a webhook config in the app, it sends a POST to the webhook URL first. The server must respond with a specific JSON format to approve/deny the operation.
+When users add or edit a webhook config in the app, it sends a POST to the webhook URL to verify the endpoint is active. The server must respond with a specific JSON format to approve/deny the connection.
+
+*(Note: Deleting a webhook does not require server approval. The app allows local deletion of inactive/offline webhooks.)*
 
 **Expected Response Format:**
 
@@ -256,6 +258,9 @@ You can customize the template in the app. For example, adding extra fields for 
 ```
 
 > [!NOTE]
+> The `User-agent: mh-piprapay-api-key` is simply a **default placeholder example** populated by the app to show you how headers work. You can safely delete it or replace it with your own actual Authentication/API headers!
+
+> [!TIP]
 > The `Content-Type: application/json; charset=utf-8` header is always set by the app regardless of custom headers. Custom headers are **merged** on top.
 
 ---
