@@ -25,5 +25,6 @@ output.json
 /captures
 .externalNativeBuild
 .cxx
-server
+server/node_modules
+server/db.json
 works.md
