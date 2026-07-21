@@ -38,3 +38,16 @@ Instead, we forked the PipraPay app source and integrated the webhook logic *dir
 The complete Webhook API Documentation, including server implementation examples, bot/AI agent integration blueprints, and database schemas, has been moved to our dedicated documentation file.
 
 👉 **[Read the Full Documentation (docs.md)](docs.md)**
+
+## 🧪 Test Server Included
+
+To make testing incredibly easy, we have included a fully functional Node.js test server right in this repository! 
+
+Instead of building your own backend from scratch just to test if the app works, you can use the provided test server. It uses a local `db.json` file to store intercepted messages so you can immediately see the app working in real-time.
+
+1. Navigate to the `server/` directory: `cd server`
+2. Install dependencies (if any): `npm install`
+3. Run the server: `node server.js`
+4. Point your PipraPay app webhook to `http://<YOUR_PC_IP>:3000/`
+
+For more details on how the API contracts work between the app and the server, please refer to the `docs.md` file.
