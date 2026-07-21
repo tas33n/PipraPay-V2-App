@@ -1,8 +1,10 @@
 package com.qube.piprapay_tool.Activity;
 
 import android.content.Context;
+import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Color;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,6 +17,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.FileProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -23,6 +26,8 @@ import com.qube.piprapay_tool.R;
 
 import org.apache.commons.text.StringEscapeUtils;
 
+import java.io.File;
+import java.net.URI;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -34,7 +39,7 @@ public class HistoryActivity extends AppCompatActivity {
     private RecyclerView rvHistory;
     private HistoryDatabaseHelper dbHelper;
     private HistoryAdapter adapter;
-    private ImageView btnBack, btnDelete, btnClearAll;
+    private ImageView btnBack, btnDelete, btnClearAll, btnExport;
 
     private boolean isMultiSelectMode = false;
 
@@ -47,6 +52,7 @@ public class HistoryActivity extends AppCompatActivity {
         btnBack = findViewById(R.id.btnBack);
         btnDelete = findViewById(R.id.btnDelete);
         btnClearAll = findViewById(R.id.btnClearAll);
+        btnExport = findViewById(R.id.btnExport);
 
         dbHelper = new HistoryDatabaseHelper(this);
         rvHistory.setLayoutManager(new LinearLayoutManager(this));
@@ -54,6 +60,21 @@ public class HistoryActivity extends AppCompatActivity {
         loadHistory();
 
         btnBack.setOnClickListener(v -> finish());
+
+        btnExport.setOnClickListener(v -> {
+            try {
+                File csvFile = dbHelper.exportToCsv(this);
+                Uri contentUri = FileProvider.getUriForFile(this, getPackageName() + ".fileprovider", csvFile);
+                Intent shareIntent = new Intent(Intent.ACTION_SEND);
+                shareIntent.setType("text/csv");
+                shareIntent.putExtra(Intent.EXTRA_STREAM, contentUri);
+                shareIntent.putExtra(Intent.EXTRA_SUBJECT, "PipraPay Transaction History");
+                shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                startActivity(Intent.createChooser(shareIntent, "Export history via"));
+            } catch (Exception e) {
+                Toast.makeText(this, "Export failed: " + e.getMessage(), Toast.LENGTH_LONG).show();
+            }
+        });
 
         btnClearAll.setOnClickListener(v -> {
             new AlertDialog.Builder(this)
@@ -97,6 +118,8 @@ public class HistoryActivity extends AppCompatActivity {
                 item.timestamp = cursor.getLong(cursor.getColumnIndexOrThrow(HistoryDatabaseHelper.COL_TIMESTAMP));
                 item.status = cursor.getString(cursor.getColumnIndexOrThrow(HistoryDatabaseHelper.COL_STATUS));
                 item.errorReason = cursor.getString(cursor.getColumnIndexOrThrow(HistoryDatabaseHelper.COL_ERROR));
+                String rawUrl = cursor.getString(cursor.getColumnIndexOrThrow(HistoryDatabaseHelper.COL_URL));
+                item.url = extractHostname(rawUrl);
                 items.add(item);
             }
             cursor.close();
@@ -113,7 +136,18 @@ public class HistoryActivity extends AppCompatActivity {
         long timestamp;
         String status;
         String errorReason;
+        String url;
         boolean isSelected = false;
+    }
+
+    private String extractHostname(String urlString) {
+        if (urlString == null || urlString.isEmpty()) return "";
+        try {
+            java.net.URL url = new java.net.URL(urlString);
+            return url.getHost();
+        } catch (Exception e) {
+            return urlString;
+        }
     }
 
     class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.ViewHolder> {
@@ -166,6 +200,13 @@ public class HistoryActivity extends AppCompatActivity {
                 holder.tvError.setVisibility(View.GONE);
             }
 
+            if (item.url != null && !item.url.isEmpty()) {
+                holder.tvUrl.setVisibility(View.VISIBLE);
+                holder.tvUrl.setText("→ " + item.url);
+            } else {
+                holder.tvUrl.setVisibility(View.GONE);
+            }
+
             int color = Color.parseColor("#FFC107"); // Pending yellow
             if (HistoryDatabaseHelper.STATUS_SUCCESS.equals(item.status)) {
                 color = Color.parseColor("#4CAF50"); // Success green
@@ -216,7 +257,7 @@ public class HistoryActivity extends AppCompatActivity {
         class ViewHolder extends RecyclerView.ViewHolder {
             View statusIndicator;
             CheckBox cbSelect;
-            TextView tvSender, tvTime, tvMessage, tvStatus, tvError;
+            TextView tvSender, tvTime, tvMessage, tvStatus, tvError, tvUrl;
 
             ViewHolder(View itemView) {
                 super(itemView);
@@ -227,6 +268,7 @@ public class HistoryActivity extends AppCompatActivity {
                 tvMessage = itemView.findViewById(R.id.tvMessage);
                 tvStatus = itemView.findViewById(R.id.tvStatus);
                 tvError = itemView.findViewById(R.id.tvError);
+                tvUrl = itemView.findViewById(R.id.tvUrl);
             }
         }
     }

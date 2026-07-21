@@ -17,10 +17,11 @@ Instead, we forked the PipraPay app source and integrated the webhook logic *dir
 
 - **Advanced Logger UI**: In-app logging with standard logcat coloring and copy/share capabilities (exports as `.log`). Proper rendering of Bangla and Unicode text.
 - **Security & Filters**: Define a Sender Whitelist (e.g., `bKash,Nagad`) or a Keyword Blacklist (e.g., block messages containing `OTP` or `password`) right from the settings.
-- **Transaction History Database**: A local SQLite database tracks the status of every SMS (Pending, Success, Failed, Ignored). View, delete, and clear records from the new History page.
+- **Transaction History Database**: A local SQLite database tracks the status of every successful SMS (Pending, Success, Failed). View, delete, and clear records from the new History page. Includes **CSV Export** functionality to save history locally.
+- **Offline Resilience & Webhook Safety**: Uses Android WorkManager to queue webhooks and automatically retry with exponential backoff if the network is down. Webhooks can be safely deleted locally when toggled off.
 - **Persistent Foreground Service**: The SMS interceptor now runs as a highly resilient foreground service (`dataSync` compliant for Android 14) to prevent aggressive battery optimizers (like MIUI) from killing it. Features live-updating notifications.
-- **Offline Resilience**: Uses Android WorkManager to queue webhooks and automatically retry with exponential backoff if the network is down.
 - **Multi-SIM Support**: Automatically detects which SIM received the SMS.
+- **Automated CI/CD**: Fully configured GitHub Actions workflow (`build.yml`) that automatically generates Debug and Release APKs (with SHA-256 hashes) for every new `v*` tag release.
 
 ## 🛠️ How to Build and Install
 

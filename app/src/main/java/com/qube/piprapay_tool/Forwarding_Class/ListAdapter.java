@@ -95,23 +95,18 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder> {
         holder.switchSmsOnOff.setChecked(config.getIsSmsEnabled());
         holder.switchSmsLabel.setText(config.getIsSmsEnabled() ? R.string.btn_on : R.string.btn_off);
 
-        holder.switchSmsOnOff.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            config.setIsSmsEnabled(isChecked);
-            holder.switchSmsLabel.setText(isChecked ? R.string.btn_on : R.string.btn_off);
-            config.save();
-        });
-
-        holder.editButton.setOnClickListener(v -> {
-            animateButtonClick( holder.editButton);
-            new ForwardingConfigDialog(
-                    context,
-                    LayoutInflater.from(context),
-                    ListAdapter.this
-            ).showEdit(config);
-        });
+        // Delete button: enabled only when webhook is OFF
+        holder.deleteButton.setEnabled(!config.getIsSmsEnabled());
+        holder.deleteButton.setAlpha(config.getIsSmsEnabled() ? 0.3f : 1.0f);
 
         holder.deleteButton.setOnClickListener(v -> {
-            animateButtonClick( holder.deleteButton);
+            animateButtonClick(holder.deleteButton);
+
+            if (config.getIsSmsEnabled()) {
+                Toast.makeText(context, "Turn off the webhook first to delete it.", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
             AlertDialog.Builder builder = new AlertDialog.Builder(context);
             builder.setTitle(R.string.delete_record);
             String message = context.getString(R.string.confirm_delete);
@@ -119,52 +114,34 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder> {
             builder.setMessage(message);
 
             builder.setPositiveButton(R.string.btn_delete, (dialog, id) -> {
-                String hook_url = holder.url.getText().toString().trim();
-
-                StringRequest stringRequest = new StringRequest(com.android.volley.Request.Method.POST, hook_url,
-                        response -> {
-                            try {
-                                JSONObject jsonResponse = new JSONObject(response);
-                                String status = jsonResponse.optString("status");
-                                if ("true".equalsIgnoreCase(status)) {
-                                    String data_message = jsonResponse.getString("message");
-                                    show_custom_tost(data_message);
-
-                                    config.remove();
-                                    dataSet.remove(position);
-                                    notifyItemRemoved(position);
-                                    notifyItemRangeChanged(position, dataSet.size());
-
-                                }else {
-                                    String data_message = jsonResponse.getString("message");
-                                    show_custom_tost(data_message);
-                                }
-                            }
-                            catch (JSONException e) {e.printStackTrace();show_custom_tost("❗Unable to connect");}
-                        },
-                        error -> { show_custom_tost("❗Unable to connect");}) {
-                    @Override
-                    protected Map<String, String> getParams() {
-                        Map<String, String> params = new HashMap<>();
-                        params.put("d_model",  Build.MODEL);    // Device Model
-                        params.put("d_brand", Build.BRAND);   // Device Brand
-                        params.put("d_version", Build.VERSION.RELEASE);  // Android Version
-                        params.put("d_api_level",Build.VERSION.SDK);  // API Level
-                        params.put("connection_status","Disconnected");  // is app is connect or inconnect
-                        return params;
-                    }
-                };
-
-                RequestQueue requestQueue = Volley.newRequestQueue(context);
-                requestQueue.add(stringRequest);
-
+                config.remove();
+                dataSet.remove(position);
+                notifyItemRemoved(position);
+                notifyItemRangeChanged(position, dataSet.size());
+                show_custom_tost("Webhook deleted.");
             });
 
             builder.setNegativeButton(R.string.btn_cancel, null);
             builder.show();
         });
 
+        // Update delete button state when toggle changes
+        holder.switchSmsOnOff.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            config.setIsSmsEnabled(isChecked);
+            holder.switchSmsLabel.setText(isChecked ? R.string.btn_on : R.string.btn_off);
+            config.save();
+            holder.deleteButton.setEnabled(!isChecked);
+            holder.deleteButton.setAlpha(isChecked ? 0.3f : 1.0f);
+        });
 
+        holder.editButton.setOnClickListener(v -> {
+            animateButtonClick(holder.editButton);
+            new ForwardingConfigDialog(
+                    context,
+                    LayoutInflater.from(context),
+                    ListAdapter.this
+            ).showEdit(config);
+        });
     }
 
     @Override

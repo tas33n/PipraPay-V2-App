@@ -64,16 +64,15 @@ public class SmsBroadcastReceiver extends BroadcastReceiver {
 
         // Security check: Whitelist
         if (!SecurityPrefs.isSenderWhitelisted(context, sender)) {
-            AppLogger.log(context, Log.WARN, "SmsReceiver", "Ignored SMS from " + sender + " (Not in whitelist)");
-            db.insertHistory(sender, content.toString(), messages[0].getTimestampMillis(), HistoryDatabaseHelper.STATUS_IGNORED, "N/A - Blocked by Whitelist");
+            AppLogger.log(context, Log.WARN, "SmsReceiver", sender + " — ignored (not in whitelist)");
+            SmsReceiverService.updateStatus(context, "Ignored SMS", sender + " not whitelisted.");
             return;
         }
 
         // Security check: Blacklist
         if (SecurityPrefs.containsBlacklistedKeyword(context, content.toString())) {
-            AppLogger.log(context, Log.WARN, "SmsReceiver", "Ignored SMS from " + sender + " (Contains blacklisted keyword)");
-            db.insertHistory(sender, content.toString(), messages[0].getTimestampMillis(), HistoryDatabaseHelper.STATUS_IGNORED, "N/A - Blocked by Blacklist");
-            SmsReceiverService.updateStatus(context, "Ignored SMS", "Message contained blocked keyword.");
+            AppLogger.log(context, Log.WARN, "SmsReceiver", sender + " — ignored (blacklisted keyword)");
+            SmsReceiverService.updateStatus(context, "Ignored SMS", "Blocked keyword from " + sender);
             return;
         }
 
@@ -108,9 +107,8 @@ public class SmsBroadcastReceiver extends BroadcastReceiver {
         }
 
         if (!matched) {
-            AppLogger.log(context, "SmsReceiver", "No matching sender config found for: " + sender);
-            db.insertHistory(sender, content.toString(), messages[0].getTimestampMillis(), HistoryDatabaseHelper.STATUS_IGNORED, "N/A - No matching config");
-            SmsReceiverService.updateStatus(context, "Ignored SMS", "No webhook configured for this sender.");
+            AppLogger.log(context, "SmsReceiver", sender + " — ignored (no matching config)");
+            SmsReceiverService.updateStatus(context, "Ignored SMS", "No config for " + sender);
         }
     }
 

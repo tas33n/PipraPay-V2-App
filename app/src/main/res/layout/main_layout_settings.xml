@@ -226,7 +226,7 @@
                 android:text="Preferencess" />
 
             <androidx.constraintlayout.widget.ConstraintLayout
-                android:id="@+id/about_us_btn"
+                android:id="@+id/source_repo_btn"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="2dp"
@@ -237,13 +237,13 @@
                 android:padding="15dp">
 
                 <ImageView
-                    android:id="@+id/about_us_image"
+                    android:id="@+id/source_repo_image"
                     android:layout_width="24dp"
                     android:layout_height="24dp"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
-                    app:srcCompat="@drawable/about_us" />
+                    app:srcCompat="@drawable/link" />
 
                 <TextView
                     style="@style/medium16"
@@ -251,10 +251,10 @@
                     android:layout_marginLeft="12dp"
                     android:drawablePadding="8dp"
                     android:gravity="center"
-                    android:text="About Us"
+                    android:text="Source Code"
                     android:textSize="14sp"
                     app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintStart_toEndOf="@+id/about_us_image"
+                    app:layout_constraintStart_toEndOf="@+id/source_repo_image"
                     app:layout_constraintTop_toTopOf="parent" />
 
                 <ImageView
@@ -266,8 +266,9 @@
                     app:layout_constraintTop_toTopOf="parent" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
+
             <androidx.constraintlayout.widget.ConstraintLayout
-                android:id="@+id/faq_btn"
+                android:id="@+id/original_repo_btn"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="2dp"
@@ -278,13 +279,13 @@
                 android:padding="15dp">
 
                 <ImageView
-                    android:id="@+id/faq_s_image"
+                    android:id="@+id/original_repo_image"
                     android:layout_width="24dp"
                     android:layout_height="24dp"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
-                    app:srcCompat="@drawable/faq_s" />
+                    app:srcCompat="@drawable/link" />
 
                 <TextView
                     style="@style/medium16"
@@ -292,92 +293,10 @@
                     android:layout_marginLeft="12dp"
                     android:drawablePadding="8dp"
                     android:gravity="center"
-                    android:text="Faq’s"
+                    android:text="Forked From (Original)"
                     android:textSize="14sp"
                     app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintStart_toEndOf="@+id/faq_s_image"
-                    app:layout_constraintTop_toTopOf="parent" />
-
-                <ImageView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:src="@drawable/ic_arrow_right_course"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
-
-            </androidx.constraintlayout.widget.ConstraintLayout>
-            <androidx.constraintlayout.widget.ConstraintLayout
-                android:id="@+id/live_support"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginHorizontal="2dp"
-                android:layout_marginBottom="5dp"
-                android:layout_marginTop="7dp"
-                android:background="@drawable/subscription_plan_unselect_course"
-                android:elevation="3dp"
-                android:padding="15dp">
-
-                <ImageView
-                    android:id="@+id/support_image"
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:srcCompat="@drawable/support" />
-
-                <TextView
-                    style="@style/medium16"
-                    android:layout_marginStart="12dp"
-                    android:layout_marginLeft="12dp"
-                    android:drawablePadding="8dp"
-                    android:gravity="center"
-                    android:text="Live Support"
-                    android:textSize="14sp"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintStart_toEndOf="@+id/support_image"
-                    app:layout_constraintTop_toTopOf="parent" />
-
-                <ImageView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:src="@drawable/ic_arrow_right_course"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
-
-            </androidx.constraintlayout.widget.ConstraintLayout>
-            <androidx.constraintlayout.widget.ConstraintLayout
-                android:id="@+id/whatsapp_support"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginHorizontal="2dp"
-                android:layout_marginBottom="5dp"
-                android:layout_marginTop="7dp"
-                android:background="@drawable/subscription_plan_unselect_course"
-                android:elevation="3dp"
-                android:padding="15dp">
-
-                <ImageView
-                    android:id="@+id/Whatsapp_image"
-                    android:layout_width="21dp"
-                    android:layout_height="21dp"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:srcCompat="@drawable/whatsapp" />
-
-                <TextView
-                    style="@style/medium16"
-                    android:layout_marginStart="12dp"
-                    android:layout_marginLeft="12dp"
-                    android:drawablePadding="8dp"
-                    android:gravity="center"
-                    android:text="Whatsapp Support"
-                    android:textSize="14sp"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintStart_toEndOf="@+id/Whatsapp_image"
+                    app:layout_constraintStart_toEndOf="@+id/original_repo_image"
                     app:layout_constraintTop_toTopOf="parent" />
 
                 <ImageView

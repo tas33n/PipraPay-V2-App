@@ -89,7 +89,7 @@ public class MainActivity extends BaseActivity {
     private CircularProgressIndicator batteryProgressBar;
     final Toast[] currentToast = new Toast[1];
     private String User_name;
-    private ConstraintLayout clear_data_btn, about_us_btn, faq_btn, live_support, whatsapp_support, security_settings_btn;
+    private ConstraintLayout clear_data_btn, source_repo_btn, original_repo_btn, security_settings_btn;
     private Handler handler;
     private Runnable urlCheckRunnable;
 
@@ -118,10 +118,8 @@ public class MainActivity extends BaseActivity {
         checkboxBattery = findViewById(R.id.checkbox_battery);
         checkbox_background_task = findViewById(R.id.checkbox_background_task);
         clear_data_btn = findViewById(R.id.clear_data_btn);
-        about_us_btn = findViewById(R.id.about_us_btn);
-        faq_btn = findViewById(R.id.faq_btn);
-        live_support = findViewById(R.id.live_support);
-        whatsapp_support = findViewById(R.id.whatsapp_support);
+        source_repo_btn = findViewById(R.id.source_repo_btn);
+        original_repo_btn = findViewById(R.id.original_repo_btn);
         security_settings_btn = findViewById(R.id.security_settings_btn);
 
         showList();
@@ -300,24 +298,14 @@ public class MainActivity extends BaseActivity {
         clear_data_btn.setOnClickListener(v -> {
             openAppSettings("Clear data manually.");
         });
-        about_us_btn.setOnClickListener(v -> {
-            Intent intent = new Intent(Intent.ACTION_VIEW);
-            intent.setData(Uri.parse("https://piprapay.com"));
+        source_repo_btn.setOnClickListener(v -> {
+            animateButtonClick(source_repo_btn);
+            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/tas33n/PipraPay-V2-App-Enhanced"));
             startActivity(intent);
         });
-        faq_btn.setOnClickListener(v -> {
-            Intent intent = new Intent(Intent.ACTION_VIEW);
-            intent.setData(Uri.parse("https://piprapay.com/#faq"));
-            startActivity(intent);
-        });
-        live_support.setOnClickListener(v -> {
-            Intent intent = new Intent(Intent.ACTION_VIEW);
-            intent.setData(Uri.parse("https://www.facebook.com/piprapay"));
-            startActivity(intent);
-        });
-        whatsapp_support.setOnClickListener(v -> {
-            Intent intent = new Intent(Intent.ACTION_VIEW);
-            intent.setData(Uri.parse("https://api.whatsapp.com/send?phone=8801806579249&text=Hello,%20%0A%20I%20have%20a%20question%20about%20https%3A%2F%2Fpiprapay.com%2F"));
+        original_repo_btn.setOnClickListener(v -> {
+            animateButtonClick(original_repo_btn);
+            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/PipraPay/PipraPay-V2-App"));
             startActivity(intent);
         });
         security_settings_btn.setOnClickListener(v -> {

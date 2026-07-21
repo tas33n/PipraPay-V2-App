@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">PipraPay Tool</string>
+    <string name="app_name">PipraPay Enhanced</string>
 
     <string name="permission_needed">Set permission to access SMS to use this app.</string>
     <string name="input_phone">6616656789</string>

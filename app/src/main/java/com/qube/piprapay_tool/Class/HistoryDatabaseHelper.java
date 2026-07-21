@@ -6,8 +6,14 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 public class HistoryDatabaseHelper extends SQLiteOpenHelper {
 
@@ -99,5 +105,44 @@ public class HistoryDatabaseHelper extends SQLiteOpenHelper {
     public Cursor getAllHistory() {
         SQLiteDatabase db = this.getReadableDatabase();
         return db.rawQuery("SELECT * FROM " + TABLE_HISTORY + " ORDER BY " + COL_TIMESTAMP + " DESC", null);
+    }
+
+    public File exportToCsv(Context context) throws IOException {
+        File exportDir = new File(context.getCacheDir(), "exports");
+        if (!exportDir.exists()) exportDir.mkdirs();
+
+        String fileName = "piprapay_history_" + new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(new Date()) + ".csv";
+        File csvFile = new File(exportDir, fileName);
+
+        Cursor cursor = getAllHistory();
+        FileWriter writer = new FileWriter(csvFile);
+
+        // CSV Header
+        writer.append("ID,Sender,Message,Timestamp,Status,Error,URL\n");
+
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US);
+        while (cursor.moveToNext()) {
+            writer.append(escapeCsv(cursor.getString(cursor.getColumnIndexOrThrow(COL_ID)))).append(",");
+            writer.append(escapeCsv(cursor.getString(cursor.getColumnIndexOrThrow(COL_SENDER)))).append(",");
+            writer.append(escapeCsv(cursor.getString(cursor.getColumnIndexOrThrow(COL_MESSAGE)))).append(",");
+            long ts = cursor.getLong(cursor.getColumnIndexOrThrow(COL_TIMESTAMP));
+            writer.append(escapeCsv(sdf.format(new Date(ts)))).append(",");
+            writer.append(escapeCsv(cursor.getString(cursor.getColumnIndexOrThrow(COL_STATUS)))).append(",");
+            String err = cursor.getString(cursor.getColumnIndexOrThrow(COL_ERROR));
+            writer.append(escapeCsv(err != null ? err : "")).append(",");
+            writer.append(escapeCsv(cursor.getString(cursor.getColumnIndexOrThrow(COL_URL)))).append("\n");
+        }
+        cursor.close();
+        writer.flush();
+        writer.close();
+        return csvFile;
+    }
+
+    private String escapeCsv(String value) {
+        if (value == null) return "";
+        if (value.contains(",") || value.contains("\"") || value.contains("\n")) {
+            return "\"" + value.replace("\"", "\"\"") + "\"";
+        }
+        return value;
     }
 }
