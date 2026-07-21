@@ -8,8 +8,8 @@ android {
         applicationId "com.qube.piprapay_enhanced"
         minSdkVersion 23
         targetSdkVersion 34
-        versionCode 3
-        versionName "1.1.1-E1"
+        versionCode 4
+        versionName "1.1.2-E1"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
