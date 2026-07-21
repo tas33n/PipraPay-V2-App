@@ -494,7 +494,7 @@ public class MainActivity extends BaseActivity {
     }
     private void battary_status() {
 
-        registerReceiver(new BroadcastReceiver() {
+        BroadcastReceiver batteryReceiver = new BroadcastReceiver() {
             @Override public void onReceive(Context context, Intent intent) {
                 int level = intent.getIntExtra(BatteryManager.EXTRA_LEVEL, 0);
                 int scale = intent.getIntExtra(BatteryManager.EXTRA_SCALE, 100);
@@ -522,7 +522,13 @@ public class MainActivity extends BaseActivity {
 
                 title_battary.setText(status);
             }
-        }, new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
+        };
+        IntentFilter filter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            registerReceiver(batteryReceiver, filter, Context.RECEIVER_EXPORTED);
+        } else {
+            registerReceiver(batteryReceiver, filter);
+        }
 
         SimpleDateFormat sdf = new SimpleDateFormat("EEE, dd MMM yyyy", Locale.getDefault());
         String currentDate = sdf.format(new Date());

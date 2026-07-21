@@ -9,6 +9,7 @@ import android.content.IntentFilter;
 import android.graphics.Color;
 import android.media.MediaPlayer;
 import android.os.Build;
+import android.os.Bundle;
 import android.telephony.SubscriptionManager;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
@@ -60,7 +61,11 @@ public class ForwardingConfigDialog {
                 Toast.makeText(context.getApplicationContext(), result, Toast.LENGTH_LONG).show();
             }
         };
-        context.registerReceiver(testResult, filter);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            context.registerReceiver(testResult, filter, Context.RECEIVER_NOT_EXPORTED);
+        } else {
+            context.registerReceiver(testResult, filter);
+        }
     }
 
 

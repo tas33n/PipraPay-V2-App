@@ -5,6 +5,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.2-E2] - 2026-07-21
+
+### Fixed
+- **Android 14 Crash:** Fixed a `SecurityException` when opening the Webhook configuration dialog caused by missing broadcast receiver export flags on Android 14 (API 34).
+
 ## [1.1.2-E1] - 2026-07-21
 
 ### Added

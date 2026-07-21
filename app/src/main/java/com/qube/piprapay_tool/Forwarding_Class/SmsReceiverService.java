@@ -54,7 +54,11 @@ public class SmsReceiverService extends Service {
             filter.addAction("android.provider.Telephony.SMS_RECEIVED");
         }
 
-        registerReceiver(receiver, filter);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            registerReceiver(receiver, filter, Context.RECEIVER_EXPORTED);
+        } else {
+            registerReceiver(receiver, filter);
+        }
         startForeground(NOTIFICATION_ID, buildNotification("Service Running", "Ready to forward SMS"));
     }
 
